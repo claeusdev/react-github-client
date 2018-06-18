@@ -12,8 +12,10 @@ import {
 import {
     InMemoryCache
 } from 'apollo-cache-inmemory'
+import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
 import './index.css';
 import App from './App';
+
 import registerServiceWorker from './registerServiceWorker';
 
 const httpLink = new HttpLink({
