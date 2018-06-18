@@ -4,7 +4,9 @@ import Repository from './Repository'
 const Repositories = ({ repositories }) =>
   repositories.edges.map(({ node }) => (
     <div key={node.id} className="repo">
-      <Repository {...node} />
+        <div className="row">
+            <Repository {...node} />
+        </div>
     </div>
   ));
 

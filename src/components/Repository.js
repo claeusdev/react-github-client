@@ -26,7 +26,7 @@ const Repository = ({
     viewersHasStarred,
     primaryLanguage}
 ) => (
-    <div>
+    <div className="col-md-4">
         <h2>
             <Link href={url}>{name}</Link>
         </h2>
