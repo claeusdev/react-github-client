@@ -15,13 +15,14 @@ import {
 import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
 import './index.css';
 import App from './App';
-
 import registerServiceWorker from './registerServiceWorker';
+
+require('dotenv').config();
 
 const httpLink = new HttpLink({
     uri: 'https://api.github.com/graphql',
     headers: {
-        authorization: `Bearer 1781062dc9d3e4100c32393a7b7e90098f060fca`
+        authorization: `Bearer ${process.env.PERSONAL_TOKEN}`
     }
 })
 
