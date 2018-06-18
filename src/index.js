@@ -33,8 +33,11 @@ const client = new ApolloClient({
 
 ReactDOM.render( 
     <ApolloProvider client={client}>
-        <App />
+        <div className="container my-3">
+            <App />
+        </div>
     </ApolloProvider>, 
     document.getElementById('root')
+    
 );
 registerServiceWorker();

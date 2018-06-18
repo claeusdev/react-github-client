@@ -14,6 +14,9 @@ const current_user = gql`
 const user_repos = gql`
     {
         viewer {
+            name
+            login
+            avatarUrl
             repositories(
                 first: 5 orderBy: {
                     direction: DESC,
@@ -57,11 +60,17 @@ const Profile = () => (
       }
 
       return (
-        <div>
-            <div className="text-center">
-                {viewer.name} - {viewer.login}
+        <div className="">
+            <div className="row">
+                <div className="col-sm-3">
+                    <img className="img-fluid rounded" src={viewer.avatarUrl} alt={viewer.login}/>
+                    <h2>{viewer.name}</h2>
+                    <p className="lead">{viewer.login}</p>
+                </div>
+                <div className="col-sm-9">
+                    <Repositories repositories={viewer.repositories} />
+                </div>
             </div>
-            <Repositories repositories={viewer.repositories} />
         </div>
       );
     }}
