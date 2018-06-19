@@ -4,14 +4,6 @@ import gql from 'graphql-tag'
 import Repositories, {Repo_Fragment} from './Repositories'
 import ErrorMessage from './Error';
 
-const current_user = gql`
-    query{
-        viewer {
-            login
-            name
-        }
-    }
-`
 const user_repos = gql`
     {
         viewer {
@@ -19,7 +11,7 @@ const user_repos = gql`
             login
             avatarUrl
             repositories(
-                first: 5 orderBy: {
+                first: 20 orderBy: {
                     direction: DESC,
                     field: STARGAZERS
                 }
@@ -34,8 +26,15 @@ const user_repos = gql`
     }
     ${Repo_Fragment}
 `
-const Profile = () => (
-    <Query query={user_repos}
+
+class Profile extends React.Component {
+    componentDidMount(){
+        console.log("Profile");
+    }
+
+    render(){
+        return (
+            <Query query={user_repos}
         notifyOnNetworkStatusChange={true}>
         {({ data, loading, error }) => {
             if (error) {
@@ -48,7 +47,7 @@ const Profile = () => (
       }
 
       return (
-        <div className="">
+        <div className="container">
             <div className="row">
                 <div className="col-sm-3">
                     <img className="img-fluid rounded" src={viewer.avatarUrl} alt={viewer.login}/>
@@ -66,7 +65,9 @@ const Profile = () => (
       );
     }}
     </Query>
-)
+        )
+    }
+}
 
 
 export default Profile

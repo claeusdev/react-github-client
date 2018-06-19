@@ -25,11 +25,12 @@ import './index.css';
 import App from './App';
 import registerServiceWorker from './registerServiceWorker';
 
+require('dotenv').config();
 
 const httpLink = new HttpLink({
     uri: 'https://api.github.com/graphql',
     headers: {
-        authorization: `Bearer ${provess.env.PERSONAL_TOKEN}`
+        authorization: `Bearer de0d86d4a8d8275d79166883dc81b0f97ab2930c`
     }
 })
 
@@ -56,7 +57,7 @@ const client = new ApolloClient({
 
 ReactDOM.render( 
     <ApolloProvider client={client}>
-        <div className="container my-3">
+        <div className="">
             <App />
         </div>
     </ApolloProvider>, 
