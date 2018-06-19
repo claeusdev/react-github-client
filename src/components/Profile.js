@@ -49,12 +49,12 @@ class Profile extends React.Component {
       return (
         <div className="container">
             <div className="row">
-                <div className="col-sm-3">
+                <div className="col-md-3">
                     <img className="img-fluid rounded" src={viewer.avatarUrl} alt={viewer.login}/>
                     <h2>{viewer.name}</h2>
                     <p className="lead">{viewer.login}</p>
                 </div>
-                <div className="col-sm-9">
+                <div className="col-md-9">
                     <h2>Repositories</h2>
                     <div className="row">
                         <Repositories repositories={viewer.repositories} />

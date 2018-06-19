@@ -30,7 +30,7 @@ require('dotenv').config();
 const httpLink = new HttpLink({
     uri: 'https://api.github.com/graphql',
     headers: {
-        authorization: `Bearer de0d86d4a8d8275d79166883dc81b0f97ab2930c`
+        authorization: `Bearer ${process.env.REACT_APP_PERSONAL_TOKEN}`
     }
 })
 
