@@ -119,8 +119,8 @@ const Repository = ({
   viewerHasStarred,
 }) => (
   <div>
-    <div className="RepositoryItem-title">
-      <h2>
+    <div className="card-title">
+      <h2 className="repo__name">
         <Link href={url}>{name}</Link>
       </h2>
 
@@ -213,21 +213,21 @@ const Repository = ({
       </div>
     </div>
 
-    <div className="RepositoryItem-description">
+    <div className="repo__description">
       <div
-        className="RepositoryItem-description-info"
+        className="repo__description-info"
         dangerouslySetInnerHTML={{ __html: descriptionHTML }}
       />
-      <div className="RepositoryItem-description-details">
+      <div className="d-flex justify-content-between">
         <div>
           {primaryLanguage && (
-            <span>Language: {primaryLanguage.name}</span>
+            <span className="text-bold">{primaryLanguage.name}</span>
           )}
         </div>
         <div>
           {owner && (
             <span>
-              Owner: <a href={owner.url}>{owner.login}</a>
+              <a href={owner.url}>{owner.login}</a>
             </span>
           )}
         </div>

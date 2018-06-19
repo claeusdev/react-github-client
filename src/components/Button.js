@@ -7,7 +7,7 @@ const Button = ({
   ...props
 }) => (
   <button
-    className={`${className} Button Button_${color}`}
+    className={`${className} btn btn-dark btn-sm`}
     type={type}
     {...props}
   >
@@ -22,7 +22,7 @@ const ButtonUnobtrusive = ({
   ...props
 }) => (
   <button
-    className={`${className} Button_unobtrusive`}
+    className={`${className} Button_unobtrusive btn-sm`}
     type={type}
     {...props}
   >

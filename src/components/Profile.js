@@ -35,7 +35,8 @@ const user_repos = gql`
     ${Repo_Fragment}
 `
 const Profile = () => (
-    <Query query={user_repos}>
+    <Query query={user_repos}
+        notifyOnNetworkStatusChange={true}>
         {({ data, loading, error }) => {
             if (error) {
                 return <ErrorMessage error={error}/>   
@@ -55,7 +56,10 @@ const Profile = () => (
                     <p className="lead">{viewer.login}</p>
                 </div>
                 <div className="col-sm-9">
-                    <Repositories repositories={viewer.repositories} />
+                    <h2>Repositories</h2>
+                    <div className="row">
+                        <Repositories repositories={viewer.repositories} />
+                    </div>
                 </div>
             </div>
         </div>

@@ -29,7 +29,7 @@ import registerServiceWorker from './registerServiceWorker';
 const httpLink = new HttpLink({
     uri: 'https://api.github.com/graphql',
     headers: {
-        authorization: 'Bearer d485d75efe9cd80d1c8f8cc5c4af58cd573edf73'
+        authorization: `Bearer ${provess.env.PERSONAL_TOKEN}`
     }
 })
 
