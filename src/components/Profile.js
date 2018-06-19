@@ -1,7 +1,8 @@
 import React from 'react'
 import { Query } from "react-apollo";
 import gql from 'graphql-tag'
-import Repositories from './Repositories'
+import Repositories, {Repo_Fragment} from './Repositories'
+import ErrorMessage from './Error';
 
 const current_user = gql`
     query{
@@ -25,34 +26,20 @@ const user_repos = gql`
             ) {
                 edges {
                     node {
-                        id
-                        name
-                        url
-                        descriptionHTML
-                        primaryLanguage {
-                            name
-                        }
-                        owner {
-                            login
-                            url
-                        }
-                        stargazers {
-                            totalCount
-                        }
-                        viewerHasStarred
-                        watchers {
-                            totalCount
-                        }
-                        viewerSubscription
+                        ...repository
                     }
                 }
             }
         }
     }
+    ${Repo_Fragment}
 `
 const Profile = () => (
     <Query query={user_repos}>
-        {({ data, loading }) => {
+        {({ data, loading, error }) => {
+            if (error) {
+                return <ErrorMessage error={error}/>   
+            }
       const { viewer } = data;
 
       if (loading || !viewer) {

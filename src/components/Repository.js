@@ -1,53 +1,240 @@
-import React from 'react'
-import Link from './Link'
-import gql from 'graphql-tag'
-import { Mutation } from 'react-apollo'
-import StarButton from './StarButton'
+import React from 'react';
+import { Mutation } from 'react-apollo';
 
-const star_repo = gql`
-    mutation($id: ID!){
-        addStar(input: {starrableId: $id }) {
-            starrable {
-                id
-                viewersHasStarred
-            }
-        }
-    }
-`
+import {
+  starRepo,
+  unstarRepo,
+  watchRepo,
+} from './Mutations';
+
+import Repo_Fragment from './Fragments';
+
+import Button from './Button';
+import Link from './Link';
+
+
+const VIEWER_SUBSCRIPTIONS = {
+  SUBSCRIBED: 'SUBSCRIBED',
+  UNSUBSCRIBED: 'UNSUBSCRIBED',
+};
+
+const isWatch = viewerSubscription =>
+  viewerSubscription === VIEWER_SUBSCRIPTIONS.SUBSCRIBED;
+
+const updateWatch = (
+  client,
+  {
+    data: {
+      updateSubscription: {
+        subscribable: { id, viewerSubscription },
+      },
+    },
+  },
+) => {
+  const repository = client.readFragment({
+    id: `Repository:${id}`,
+    fragment: Repo_Fragment,
+  });
+
+  let { totalCount } = repository.watchers;
+  totalCount =
+    viewerSubscription === VIEWER_SUBSCRIPTIONS.SUBSCRIBED
+      ? totalCount + 1
+      : totalCount - 1;
+
+  client.writeFragment({
+    id: `Repository:${id}`,
+    fragment: Repo_Fragment,
+    data: {
+      ...repository,
+      watchers: {
+        ...repository.watchers,
+        totalCount,
+      },
+    },
+  });
+};
+
+const updateAddStar = (
+  client,
+  {
+    data: {
+      addStar: {
+        starrable: { id, viewerHasStarred },
+      },
+    },
+  },
+) =>
+  client.writeFragment({
+    id: `Repository:${id}`,
+    fragment: Repo_Fragment,
+    data: getUpdatedStarData(client, id, viewerHasStarred),
+  });
+
+const updateRemoveStar = (
+  client,
+  {
+    data: {
+      removeStar: {
+        starrable: { id, viewerHasStarred },
+      },
+    },
+  },
+) => {
+  client.writeFragment({
+    id: `Repository:${id}`,
+    fragment: Repo_Fragment,
+    data: getUpdatedStarData(client, id, viewerHasStarred),
+  });
+};
+
+const getUpdatedStarData = (client, id, viewerHasStarred) => {
+  const repository = client.readFragment({
+    id: `Repository:${id}`,
+    fragment: Repo_Fragment,
+  });
+
+  let { totalCount } = repository.stargazers;
+  totalCount = viewerHasStarred ? totalCount + 1 : totalCount - 1;
+
+  return {
+    ...repository,
+    stargazers: {
+      ...repository.stargazers,
+      totalCount,
+    },
+  };
+};
+
 const Repository = ({
-    id,
-    name,
-    url,
-    descriptionHTML,
-    owner,
-    stargazers,
-    watchers,
-    viewersSubscriptions,
-    viewersHasStarred,
-    primaryLanguage}
-) => (
-    <div className="col-md-4">
-        <h2>
-            <Link href={url}>{name}</Link>
-        </h2>
-        <div className="stars">
-            
+  id,
+  name,
+  url,
+  descriptionHTML,
+  primaryLanguage,
+  owner,
+  stargazers,
+  watchers,
+  viewerSubscription,
+  viewerHasStarred,
+}) => (
+  <div>
+    <div className="RepositoryItem-title">
+      <h2>
+        <Link href={url}>{name}</Link>
+      </h2>
+
+      <div>
+        <Mutation
+          mutation={watchRepo}
+          variables={{
+            id,
+            viewerSubscription: isWatch(viewerSubscription)
+              ? VIEWER_SUBSCRIPTIONS.UNSUBSCRIBED
+              : VIEWER_SUBSCRIPTIONS.SUBSCRIBED,
+          }}
+          optimisticResponse={{
+            updateSubscription: {
+              __typename: 'Mutation',
+              subscribable: {
+                __typename: 'Repository',
+                id,
+                viewerSubscription: isWatch(viewerSubscription)
+                  ? VIEWER_SUBSCRIPTIONS.UNSUBSCRIBED
+                  : VIEWER_SUBSCRIPTIONS.SUBSCRIBED,
+              },
+            },
+          }}
+          update={updateWatch}
+        >
+          {(updateSubscription, { data, loading, error }) => (
+            <Button
+              className="RepositoryItem-title-action"
+              data-test-id="updateSubscription"
+              onClick={updateSubscription}
+            >
+              {watchers.totalCount}{' '}
+              {isWatch(viewerSubscription) ? 'Unwatch' : 'Watch'}
+            </Button>
+          )}
+        </Mutation>
+
+        {viewerHasStarred ? (
+          <Mutation
+            mutation={unstarRepo}
+            variables={{ id }}
+            optimisticResponse={{
+              removeStar: {
+                __typename: 'Mutation',
+                starrable: {
+                  __typename: 'Repository',
+                  id,
+                  viewerHasStarred: !viewerHasStarred,
+                },
+              },
+            }}
+            update={updateRemoveStar}
+          >
+            {(removeStar, { data, loading, error }) => (
+              <Button
+                className="RepositoryItem-title-action"
+                onClick={removeStar}
+              >
+                {stargazers.totalCount} Unstar
+              </Button>
+            )}
+          </Mutation>
+        ) : (
+          <Mutation
+            mutation={starRepo}
+            variables={{ id }}
+            optimisticResponse={{
+              addStar: {
+                __typename: 'Mutation',
+                starrable: {
+                  __typename: 'Repository',
+                  id,
+                  viewerHasStarred: !viewerHasStarred,
+                },
+              },
+            }}
+            update={updateAddStar}
+          >
+            {(addStar, { data, loading, error }) => (
+              <Button
+                className="RepositoryItem-title-action"
+                onClick={addStar}
+              >
+                {stargazers.totalCount} Star
+              </Button>
+            )}
+          </Mutation>
+        )}
+      </div>
+    </div>
+
+    <div className="RepositoryItem-description">
+      <div
+        className="RepositoryItem-description-info"
+        dangerouslySetInnerHTML={{ __html: descriptionHTML }}
+      />
+      <div className="RepositoryItem-description-details">
+        <div>
+          {primaryLanguage && (
+            <span>Language: {primaryLanguage.name}</span>
+          )}
         </div>
         <div>
-            <Mutation mutation={star_repo} variables={{ id}}>
-                {(addStar, {data, loading, error }) =>( <StarButton className={'repo_star_button'} onClick={addStar}>{stargazers.totalCount} Stars</StarButton>)}
-            </Mutation>
+          {owner && (
+            <span>
+              Owner: <a href={owner.url}>{owner.login}</a>
+            </span>
+          )}
         </div>
-        <div className="repo_description">
-            <div className="repo_description__info" dangerouslySetInnerHTML={{__html: descriptionHTML }}/>
-            <div className="repo_description_language">
-                {primaryLanguage && (<span>Language: {primaryLanguage.name}</span>)}
-            </div>
-            <div className="repo_description__owner">
-                {owner && (<span>By: <a href={owner.url}>{owner.login}</a></span>)}
-            </div>
-        </div>
+      </div>
     </div>
-)
+  </div>
+);
+
 
 export default Repository

@@ -1,5 +1,6 @@
 import React  from 'react'
 import Repository from './Repository'
+import Repo_Fragment from './Fragments'
 
 const Repositories = ({ repositories }) =>
   repositories.edges.map(({ node }) => (
@@ -12,5 +13,5 @@ const Repositories = ({ repositories }) =>
 
 
 
-
+export {Repo_Fragment}
 export default Repositories
